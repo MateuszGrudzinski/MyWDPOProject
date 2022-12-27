@@ -1,3 +1,4 @@
+import glob
 import json
 from pathlib import Path
 from typing import Dict
@@ -36,7 +37,9 @@ def detect(img_path: str) -> Dict[str, int]:
 @click.option('-p', '--data_path', help='Path to data directory', type=click.Path(exists=True, file_okay=False, path_type=Path), required=True)
 @click.option('-o', '--output_file_path', help='Path to output file', type=click.Path(dir_okay=False, path_type=Path), required=True)
 def main(data_path: Path, output_file_path: Path):
-    img_list = data_path.glob('*.jpg')
+
+    temp_path1 = Path('C:/Users/jpgjp/OneDrive/Pulpit/Projekt/MyWDPOProject/data')
+    img_list = temp_path1.glob('*.jpg')
 
     results = {}
 

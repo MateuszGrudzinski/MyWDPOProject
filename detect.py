@@ -32,7 +32,7 @@ def detect(img_path: str) -> Dict[str, int]:
     cv2.namedWindow('threshold_r', cv2.WINDOW_NORMAL)
 
     img = cv2.imread(img_path, cv2.IMREAD_COLOR)
-    blur = cv2.GaussianBlur(img,(7,7),0)
+    blur = cv2.GaussianBlur(img,(5,5),0)
     img_hsv = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
 
     minhsv_y = np.array([20, 100, 100])
@@ -40,8 +40,8 @@ def detect(img_path: str) -> Dict[str, int]:
     maskhsv = cv2.inRange(img_hsv, minhsv_y, maxhsv_y)
     resulthsv = cv2.bitwise_and(img_hsv, img_hsv, mask=maskhsv)
     yellow_img_raw = cv2.cvtColor(resulthsv, cv2.COLOR_HSV2BGR)
-    yellow_img = cv2.medianBlur(yellow_img_raw,5)
-    yellow_canny = cv2.Canny(yellow_img, 10, 150, 3)
+    yellow_img = cv2.medianBlur(yellow_img_raw,9)
+    yellow_canny = cv2.Canny(cv2.cvtColor(yellow_img,cv2.COLOR_BGR2GRAY), 30, 80, 3)
     dilated_y = cv2.dilate(yellow_canny, (1, 1), iterations=0)
 
     (cnt, hierarchy) = cv2.findContours(

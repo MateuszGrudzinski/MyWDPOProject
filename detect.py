@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from typing import Dict
 import click
-import cv2
+from cv2 import cv2
 import numpy as np
 from tqdm import tqdm
 
@@ -46,7 +46,7 @@ def detect(img_path: str) -> Dict[str, int]:
 
     dilated_y = cv2.dilate(canny_mask_y, (1, 1), iterations=20)
     (cnt_y, hierarchy) = cv2.findContours(
-        canny_mask_y.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        dilated_y.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
     #done
     minhsv_g = np.array([33, 50, 50])
@@ -60,13 +60,11 @@ def detect(img_path: str) -> Dict[str, int]:
     resulthsv_H = resulthsv[:, :, 0]
     resulthsv_H = cv2.medianBlur(resulthsv_H, 15)
     canny_mask_g = cv2.Canny(resulthsv_H, 0, 15);
-    kernel = np.ones((1, 1), np.uint8)
-    canny_mask_g = cv2.morphologyEx(canny_mask_g, cv2.MORPH_OPEN, kernel)
     green_img = cv2.cvtColor(resulthsv, cv2.COLOR_HSV2BGR)
 
     dilated_g = cv2.dilate(canny_mask_g, (1, 1), iterations=20)
     (cnt_g, hierarchy) = cv2.findContours(
-        canny_mask_y.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        dilated_g.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
     minhsv_p = np.array([125, 25, 25])
     maxhsv_p = np.array([170, 255, 255])
@@ -83,7 +81,7 @@ def detect(img_path: str) -> Dict[str, int]:
 
     dilated_p = cv2.dilate(canny_mask_p, (1, 1), iterations=20)
     (cnt_p, hierarchy) = cv2.findContours(
-        canny_mask_p.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        dilated_p.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
     minhsv_r = np.array([173, 35, 75])
     maxhsv_r = np.array([179, 255, 255])
@@ -104,7 +102,7 @@ def detect(img_path: str) -> Dict[str, int]:
 
     dilated_r = cv2.dilate(canny_mask_r, (1, 1), iterations=5)
     (cnt_r, hierarchy) = cv2.findContours(
-        canny_mask_r.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        dilated_r.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
 
     red = len(cnt_r)
@@ -120,8 +118,7 @@ def detect(img_path: str) -> Dict[str, int]:
 @click.option('-o', '--output_file_path', help='Path to output file', type=click.Path(dir_okay=False, path_type=Path), required=True)
 def main(data_path: Path, output_file_path: Path):
 
-    temp_path1 = Path(data_path.decode('utf-8'))
-    img_list = temp_path1.glob('*.jpg')
+    img_list = data_path.glob('*.jpg')
     results = {}
 
     for img_path in tqdm(sorted(img_list)):
